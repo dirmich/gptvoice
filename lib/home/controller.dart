@@ -15,12 +15,17 @@ class HomeController extends GetxController {
   var isListening = false.obs;
   var isInitialized = false.obs;
   var readWords = ''.obs;
+  var ai_result = ''.obs;
+  void init() async {
+    await _initSpeech();
+    await _initTextToSpeech();
+  }
+
   @override
   void onInit() {
     _speechToText = SpeechToText();
-    _initSpeech();
     tts = FlutterTts();
-    _initTextToSpeech();
+    init();
     super.onInit();
   }
 
@@ -31,9 +36,9 @@ class HomeController extends GetxController {
     super.onClose();
   }
 
-  void toggleLanguage() {
+  void toggleLanguage() async {
     isKorean(!isKorean.value);
-    tts.setLanguage(isKorean.value ? 'ko_KR' : 'en_US');
+    await tts.setLanguage(isKorean.value ? 'ko_KR' : 'en_US');
   }
 
   Future<void> speak(String speech) async {
@@ -54,6 +59,7 @@ class HomeController extends GetxController {
     if (Platform.isIOS) {
       await tts.setSharedInstance(true);
     }
+    tts.setLanguage('ko_KR');
   }
 
   Future<void> startListening() async {
@@ -62,15 +68,19 @@ class HomeController extends GetxController {
         localeId: isKorean.value ? 'ko_KR' : 'en_US');
   }
 
-  void _onStatus(String status) {
+  void _onStatus(String status) async {
     debugPrint('status: $status');
     if (status == 'listening') {
       isListening(true);
     } else if (status == 'notListening') {
       isListening(false);
     } else if (status == 'done') {
-      speak(readWords.value);
-      openai.isArtPromptAPI(readWords.value);
+      debugPrint('REQ] ${readWords.value}');
+      ai_result.value = await openai.isArtPromptAPI(readWords.value);
+      debugPrint('RESP] ${ai_result.value}');
+      if (!ai_result.value.contains('http')) {
+        speak(ai_result.value);
+      }
     }
   }
 

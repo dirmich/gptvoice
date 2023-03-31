@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-const apiKey = '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';
+// const apiKey = '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';
+const apiKey = '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';
 
 class OpenAIService extends GetConnect {
   OpenAIService() {
     httpClient.timeout = const Duration(seconds: 10);
   }
-  Future<String?> isArtPromptAPI(String prompt) async {
+  Future<String> isArtPromptAPI(String prompt) async {
     try {
       debugPrint('[PROMPT]: $prompt');
       final res = await post(
@@ -43,11 +44,11 @@ class OpenAIService extends GetConnect {
       }
     } catch (e) {
       debugPrint(e.toString());
-      return null;
+      return 'Error';
     }
   }
 
-  Future<String?> textApi(String prompt) async {
+  Future<String> textApi(String prompt) async {
     try {
       final res = await post(
           'https://api.openai.com/v1/chat/completions',
@@ -61,7 +62,6 @@ class OpenAIService extends GetConnect {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $apiKey'
           });
-
       if (res.statusCode != 200) throw 'Error';
       String recv = res.body['choices'][0]['message']['content'];
       recv = recv.trim();
@@ -69,11 +69,11 @@ class OpenAIService extends GetConnect {
       return recv;
     } catch (e) {
       debugPrint(e.toString());
-      return null;
+      return 'Error';
     }
   }
 
-  Future<String?> imageApi(String prompt) async {
+  Future<String> imageApi(String prompt) async {
     try {
       final res = await post(
           'https://api.openai.com/v1/images/generations',
@@ -95,7 +95,7 @@ class OpenAIService extends GetConnect {
       return recv;
     } catch (e) {
       debugPrint(e.toString());
-      return null;
+      return 'Error';
     }
   }
 }

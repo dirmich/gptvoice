@@ -4,6 +4,7 @@ import 'package:gptvoice/pallet.dart';
 import 'package:gptvoice/routes/route.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
